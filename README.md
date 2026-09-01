@@ -122,12 +122,14 @@ no network access.
 ## Releasing
 
 Releases go out through [staged publishing](https://docs.npmjs.com/staged-publishing/),
-so a green workflow is not enough to put a version on the registry.
+authenticated by [trusted publishing](https://docs.npmjs.com/trusted-publishers/).
+There is no `NPM_TOKEN`: npm recognises the workflow itself through an OIDC
+token, so there is no long-lived credential to leak, and a green workflow is
+still not enough to put a version on the registry.
 
-Publishing a GitHub release runs the tests and then
-`npm stage publish --provenance`. That uploads the tarball and parks it in the
-stage queue, where it is **not installable**. A maintainer then promotes it by
-hand:
+Publishing a GitHub release runs the tests and then `npm stage publish`. That
+uploads the tarball and parks it in the stage queue, where it is **not
+installable**. A maintainer then promotes it by hand:
 
 ```sh
 npm stage list jsrex          # find the stage id
@@ -138,27 +140,28 @@ npm stage approve <stage-id>  # answer the 2FA challenge; the version goes live
 `npm stage reject <stage-id>` throws it away instead, and `npm stage download
 <stage-id>` fetches the tarball if you would rather unpack it yourself.
 
-The approval is the point: a token or workflow that has been tampered with can
-stage a version, but it cannot make anyone install it — that still takes a
-maintainer and a second factor. Approving needs npm 11.15.0 or newer and 2FA on
-the account, and provenance is attested exactly as it is for a direct publish.
+The approval is the point: a workflow that has been tampered with can stage a
+version, but it cannot make anyone install it — that still takes a maintainer
+and a second factor. OIDC does not weaken this, because a token minted by
+trusted publishing is not allowed to approve from the stage queue. Approving
+needs npm 11.15.0 or newer and 2FA on the account.
 
-### The first release is different
+Provenance is attested automatically. Trusted publishing generates it without
+being asked, which is why the workflow passes no `--provenance` flag.
 
-npm has no stage queue for a package that does not exist yet: a brand-new name
-cannot be staged, because staging is a check on an existing package's
-maintainers, not a way to claim a name. So the very first version has to be
-published directly.
+### Two things the workflow depends on
 
-Run the `Publish` workflow from the Actions tab with **first publish** ticked.
-That takes the `npm publish --provenance --access public` path instead, which
-still attests provenance from CI. `--access public` is required there rather
-than decorative: npm will not attest provenance for a package it has not seen
-before unless access is stated outright, even for an unscoped name that is
-public anyway.
+The trusted publisher registered for `jsrex` on npmjs.com names a workflow
+**file**, so it has to say `publish.yml`. Renaming this file breaks publishing
+until the npm-side configuration is updated to match.
 
-Every release after that — and every run triggered by a GitHub release, ticked
-or not — goes through the stage queue.
+`registry-url` is deliberately absent from the `setup-node` step. Setting it
+makes the action write `_authToken=${NODE_AUTH_TOKEN}` into `.npmrc`; with no
+token in the environment npm reads that as authentication already being
+configured, never starts the OIDC exchange, and fails with `ENEEDAUTH`
+([actions/setup-node#1551](https://github.com/actions/setup-node/issues/1551)).
+Publishing targets registry.npmjs.org by default, so nothing is lost by
+leaving it out.
 
 ## License
 
