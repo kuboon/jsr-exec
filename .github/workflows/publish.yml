@@ -42,8 +42,12 @@ jobs:
       # first release has to go out directly. This step is reachable only from
       # a manual dispatch with the box ticked — a release-triggered run always
       # takes the staged path above.
+      #
+      # `--access public` is required, not decorative: npm refuses to attest
+      # provenance for a package it has not seen before unless access is stated
+      # outright ("Can't generate provenance for new or private package").
       - name: Publish the first release directly
         if: ${{ inputs.first_publish }}
-        run: npm publish --provenance
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
