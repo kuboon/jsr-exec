@@ -1,6 +1,6 @@
 {
   "name": "jsrex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Run a JSR package with Node.js: npx jsrex @scope/name — the Node equivalent of deno run jsr:@scope/name",
   "type": "module",
   "bin": {

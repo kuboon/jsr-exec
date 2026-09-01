@@ -65,7 +65,7 @@ seed(
  */
 function run(args, env = {}) {
   return execFileAsync(process.execPath, [BIN, ...args], {
-    env: { ...process.env, JSR_X_CACHE: cache, ...env },
+    env: { ...process.env, JSREX_CACHE: cache, ...env },
   });
 }
 
@@ -150,7 +150,7 @@ test("forwards SIGTERM to the program and reports 143", async (t) => {
   );
 
   const child = spawn(process.execPath, [BIN, "@kuboon/sleeper@1.0.0"], {
-    env: { ...process.env, JSR_X_CACHE: cache },
+    env: { ...process.env, JSREX_CACHE: cache },
     stdio: ["ignore", "pipe", "inherit"],
   });
 

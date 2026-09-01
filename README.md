@@ -64,11 +64,11 @@ error — use `--` if the program's own first argument looks like one.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `JSR_X_CACHE` | OS cache dir + `/jsrex` | Where packages are cached. |
+| `JSREX_CACHE` | OS cache dir + `/jsrex` | Where packages are cached. |
 | `JSR_URL` | `https://jsr.io` | JSR registry used for version resolution. |
 | `JSR_NPM_URL` | `https://npm.jsr.io` | JSR npm-compatibility registry used for downloads. |
 
-`jsrex` sets `JSR_X=1` in the child process, so a program can tell it was
+`jsrex` sets `JSREX=1` in the child process, so a program can tell it was
 launched this way.
 
 ## How it works

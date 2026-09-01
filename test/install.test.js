@@ -106,7 +106,7 @@ test("installs from the npm-compat registry and runs the package", { skip: !hasN
   const cache = path.join(root, "cache");
   const env = {
     ...process.env,
-    JSR_X_CACHE: cache,
+    JSREX_CACHE: cache,
     JSR_NPM_URL: registry.url,
     // Version resolution must not reach jsr.io: the specifier is exact.
     JSR_URL: "http://127.0.0.1:1/unreachable",
