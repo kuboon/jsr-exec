@@ -10,7 +10,7 @@ import { npmRegistry } from "./registry.js";
 
 /** Root directory holding one installation tree per resolved package version. */
 export function cacheRoot() {
-  const override = process.env.JSR_X_CACHE;
+  const override = process.env.JSREX_CACHE;
   if (override) return path.resolve(override);
 
   const home = os.homedir();

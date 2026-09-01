@@ -41,7 +41,7 @@ Options:
   --                    End option parsing; everything after is the specifier.
 
 Environment:
-  JSR_X_CACHE   Cache directory (default: the OS cache dir + /jsrex).
+  JSREX_CACHE   Cache directory (default: the OS cache dir + /jsrex).
   JSR_URL       JSR registry base URL (default: https://jsr.io).
   JSR_NPM_URL   JSR npm-compat registry (default: https://npm.jsr.io).
 
@@ -145,7 +145,7 @@ function runEntry(entry, args) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [entry, ...args], {
       stdio: "inherit",
-      env: { ...process.env, JSR_X: "1" },
+      env: { ...process.env, JSREX: "1" },
     });
 
     // Hold signals so the program gets a chance to shut down cleanly; without
