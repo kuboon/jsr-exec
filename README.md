@@ -119,6 +119,30 @@ resolution, CLI argument handling, an end-to-end run against a seeded cache, and
 a real `npm install` against a throwaway registry served from localhost. It needs
 no network access.
 
+## Releasing
+
+Releases go out through [staged publishing](https://docs.npmjs.com/staged-publishing/),
+so a green workflow is not enough to put a version on the registry.
+
+Publishing a GitHub release (or dispatching the `Publish` workflow) runs the
+tests and then `npm stage publish --provenance`. That uploads the tarball and
+parks it in the stage queue, where it is **not installable**. A maintainer then
+promotes it by hand:
+
+```sh
+npm stage list jsr-x          # find the stage id
+npm stage view <stage-id>     # inspect what CI actually built
+npm stage approve <stage-id>  # answer the 2FA challenge; the version goes live
+```
+
+`npm stage reject <stage-id>` throws it away instead, and `npm stage download
+<stage-id>` fetches the tarball if you would rather unpack it yourself.
+
+The approval is the point: a token or workflow that has been tampered with can
+stage a version, but it cannot make anyone install it — that still takes a
+maintainer and a second factor. Approving needs npm 11.15.0 or newer and 2FA on
+the account, and provenance is attested exactly as it is for a direct publish.
+
 ## License
 
 MIT
