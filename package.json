@@ -1,0 +1,42 @@
+{
+  "name": "jsr-x",
+  "version": "0.1.0",
+  "description": "Run a JSR package with Node.js: npx jsr-x @scope/name — the Node equivalent of deno run jsr:@scope/name",
+  "type": "module",
+  "bin": {
+    "jsr-x": "bin/jsr-x.js"
+  },
+  "exports": {
+    ".": "./src/cli.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "keywords": [
+    "jsr",
+    "npx",
+    "cli",
+    "runner",
+    "deno"
+  ],
+  "license": "MIT",
+  "author": "kuboon",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kuboon/jsr-exec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kuboon/jsr-exec/issues"
+  },
+  "homepage": "https://github.com/kuboon/jsr-exec#readme"
+}
