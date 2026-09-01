@@ -4,9 +4,17 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      first_publish:
+        description: >-
+          Publish directly instead of staging. npm has no stage queue for a
+          package that does not exist yet, so this is needed for the very
+          first release of jsr-x — and never again.
+        type: boolean
+        default: false
 
 jobs:
-  stage:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,9 +28,22 @@ jobs:
       # `npm stage` needs npm 11.15.0 or newer; the bundled npm may be older.
       - run: npm install -g npm@latest
       - run: npm test
+
       # Stages the version rather than releasing it. It becomes installable
       # only once a maintainer runs `npm stage approve <id>` and answers the
       # 2FA challenge, so a compromised workflow cannot ship on its own.
-      - run: npm stage publish --provenance
+      - name: Stage the release for approval
+        if: ${{ !inputs.first_publish }}
+        run: npm stage publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Staging requires the package to already exist on the registry, so the
+      # first release has to go out directly. This step is reachable only from
+      # a manual dispatch with the box ticked — a release-triggered run always
+      # takes the staged path above.
+      - name: Publish the first release directly
+        if: ${{ inputs.first_publish }}
+        run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
