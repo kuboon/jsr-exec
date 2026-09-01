@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const BIN = fileURLToPath(new URL("../bin/jsr-exec.js", import.meta.url));
+const BIN = fileURLToPath(new URL("../bin/jsr-x.js", import.meta.url));
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
 const hasNpm = spawnSync(npmCommand, ["--version"], {
@@ -26,7 +26,7 @@ const hasNpm = spawnSync(npmCommand, ["--version"], {
   shell: process.platform === "win32",
 }).status === 0;
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "jsr-exec-install-"));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "jsr-x-install-"));
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
 /**
@@ -106,7 +106,7 @@ test("installs from the npm-compat registry and runs the package", { skip: !hasN
   const cache = path.join(root, "cache");
   const env = {
     ...process.env,
-    JSR_EXEC_CACHE: cache,
+    JSR_X_CACHE: cache,
     JSR_NPM_URL: registry.url,
     // Version resolution must not reach jsr.io: the specifier is exact.
     JSR_URL: "http://127.0.0.1:1/unreachable",

@@ -1,10 +1,10 @@
-# jsr-exec
+# jsr-x
 
 Run a [JSR](https://jsr.io) package with Node.js, the way `deno run jsr:@scope/name`
 runs one with Deno.
 
 ```sh
-npx @kuboon/jsr-exec @kuboon/package
+npx jsr-x @kuboon/package
 ```
 
 is the Node equivalent of
@@ -19,39 +19,40 @@ is fetched into a shared cache and executed.
 ## Usage
 
 ```sh
-npx @kuboon/jsr-exec [options] <@scope/name[@version][/entrypoint]> [args...]
+npx jsr-x [options] <@scope/name[@version][/entrypoint]> [args...]
 ```
 
 ```sh
 # Latest version, default export
-npx @kuboon/jsr-exec @kuboon/package
+npx jsr-x @kuboon/package
 
 # A pinned version, with arguments for the program
-npx @kuboon/jsr-exec @kuboon/package@1.2.3 --flag value
+npx jsr-x @kuboon/package@1.2.3 --flag value
 
 # A range and a named export, with the jsr: scheme spelled out
-npx @kuboon/jsr-exec jsr:@std/http@^1/file-server ./public
+npx jsr-x jsr:@std/http@^1/file-server ./public
 ```
 
 Arguments after the specifier belong to the program and are passed through
-untouched, so `--help` after the specifier is the program's help, not
-`jsr-exec`'s. The program's exit code becomes `jsr-exec`'s exit code.
+untouched, so `--help` after the specifier is the program's help, not `jsr-x`'s.
+The program's exit code becomes `jsr-x`'s exit code.
 
-Installing it globally gives you the shorter `jsr-exec` command:
+Installing it globally drops the `npx`:
 
 ```sh
-npm install -g @kuboon/jsr-exec
-jsr-exec @kuboon/package
+npm install -g jsr-x
+jsr-x @kuboon/package
 ```
 
 ### Options
 
-Options are recognised only *before* the specifier.
+Options are recognised only *before* the specifier. An unknown option is an
+error — use `--` if the program's own first argument looks like one.
 
 | Option | Effect |
 | --- | --- |
 | `-h`, `--help` | Show usage. |
-| `-V`, `--version` | Show the `jsr-exec` version. |
+| `-V`, `--version` | Show the `jsr-x` version. |
 | `-q`, `--quiet` | Silence installation output. |
 | `--refresh` | Re-install even when the version is already cached. |
 | `--offline` | Never reach the network; resolve against the cache only. |
@@ -59,18 +60,15 @@ Options are recognised only *before* the specifier.
 | `--cache-dir` | Print the cache directory and exit. |
 | `--` | End option parsing. |
 
-Deno permission flags (`-A`, `--allow-net`, `--unstable-*`, …) are accepted and
-ignored, so a command copied from Deno docs still runs.
-
 ### Environment
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `JSR_EXEC_CACHE` | OS cache dir + `/jsr-exec` | Where packages are cached. |
+| `JSR_X_CACHE` | OS cache dir + `/jsr-x` | Where packages are cached. |
 | `JSR_URL` | `https://jsr.io` | JSR registry used for version resolution. |
 | `JSR_NPM_URL` | `https://npm.jsr.io` | JSR npm-compatibility registry used for downloads. |
 
-`jsr-exec` sets `JSR_EXEC=1` in the child process, so a program can tell it was
+`jsr-x` sets `JSR_X=1` in the child process, so a program can tell it was
 launched this way.
 
 ## How it works
@@ -103,8 +101,9 @@ under Deno.
 
 Two more consequences of running on Node:
 
-- There is no permission sandbox. Deno's permission flags are ignored, and the
-  program has whatever access your Node process has.
+- There is no permission sandbox. Deno's permission flags are not accepted —
+  `jsr-x -A @scope/name` is an error rather than a lie — and the program has
+  whatever access your Node process has.
 - `npm` must be on `PATH`; it does the downloading and dependency resolution.
 
 Requires Node.js 20.11 or newer.

@@ -10,19 +10,19 @@ import { npmRegistry } from "./registry.js";
 
 /** Root directory holding one installation tree per resolved package version. */
 export function cacheRoot() {
-  const override = process.env.JSR_EXEC_CACHE;
+  const override = process.env.JSR_X_CACHE;
   if (override) return path.resolve(override);
 
   const home = os.homedir();
   if (process.platform === "win32") {
     const base = process.env.LOCALAPPDATA || path.join(home, "AppData", "Local");
-    return path.join(base, "jsr-exec", "Cache");
+    return path.join(base, "jsr-x", "Cache");
   }
   if (process.platform === "darwin") {
-    return path.join(home, "Library", "Caches", "jsr-exec");
+    return path.join(home, "Library", "Caches", "jsr-x");
   }
   const xdg = process.env.XDG_CACHE_HOME;
-  return path.join(xdg && path.isAbsolute(xdg) ? xdg : path.join(home, ".cache"), "jsr-exec");
+  return path.join(xdg && path.isAbsolute(xdg) ? xdg : path.join(home, ".cache"), "jsr-x");
 }
 
 /**
@@ -44,7 +44,7 @@ export function installedPackagePath(dir, spec) {
 }
 
 /** Marker written last, so a half-finished install is never treated as usable. */
-const STAMP = ".jsr-exec-complete";
+const STAMP = ".jsr-x-complete";
 
 /**
  * @param {string} dir
@@ -62,7 +62,7 @@ export function isInstalled(dir, spec) {
  * into a fresh directory, then move it into the cache.
  *
  * The install happens in a sibling temp directory and is renamed into place so
- * concurrent `jsr-exec` runs never observe a partial tree.
+ * concurrent `jsr-x` runs never observe a partial tree.
  *
  * @param {import("./spec.js").Spec} spec
  * @param {string} version
@@ -87,7 +87,7 @@ export function install(spec, version, options = {}) {
       path.join(staging, "package.json"),
       `${JSON.stringify(
         {
-          name: `jsr-exec-${spec.scope}-${spec.name}`,
+          name: `jsr-x-${spec.scope}-${spec.name}`,
           version: "0.0.0",
           private: true,
           dependencies: { [spec.npmName]: version },
@@ -130,7 +130,7 @@ export function install(spec, version, options = {}) {
     if (result.error) {
       const cause = /** @type {NodeJS.ErrnoException} */ (result.error);
       if (cause.code === "ENOENT") {
-        throw new Error("npm was not found on PATH; jsr-exec needs npm to install packages");
+        throw new Error("npm was not found on PATH; jsr-x needs npm to install packages");
       }
       throw cause;
     }

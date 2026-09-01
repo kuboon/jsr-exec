@@ -1,4 +1,4 @@
-/** Argument parsing and the top-level `jsr-exec` command. */
+/** Argument parsing and the top-level `jsr-x` command. */
 
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -20,23 +20,19 @@ import { resolveVersion } from "./registry.js";
 import { isVersion, maxSatisfying } from "./semver.js";
 import { looksLikeSpec, parseSpec } from "./spec.js";
 
-/** Deno flags that have no meaning on Node; accepted so muscle memory works. */
-const IGNORED_DENO_FLAGS =
-  /^(-A|-[RWNESI]|--allow-[a-z-]+|--deny-[a-z-]+|--no-prompt|--no-check|--no-lock|--no-config|--cached-only|--unstable(-[a-z-]+)?)(=.*)?$/;
-
-export const USAGE = `jsr-exec — run a JSR package with Node.js
+export const USAGE = `jsr-x — run a JSR package with Node.js
 
 Usage:
-  jsr-exec [options] <@scope/name[@version][/entrypoint]> [args...]
+  jsr-x [options] <@scope/name[@version][/entrypoint]> [args...]
 
 Examples:
-  npx @kuboon/jsr-exec @kuboon/package
-  npx @kuboon/jsr-exec @kuboon/package@1.2.3 --flag value
-  npx @kuboon/jsr-exec jsr:@std/http@^1/file-server ./public
+  npx jsr-x @kuboon/package
+  npx jsr-x @kuboon/package@1.2.3 --flag value
+  npx jsr-x jsr:@std/http@^1/file-server ./public
 
 Options:
   -h, --help            Show this help.
-  -V, --version         Show the jsr-exec version.
+  -V, --version         Show the jsr-x version.
   -q, --quiet           Silence installation output.
       --refresh         Re-install even if the version is already cached.
       --offline         Fail instead of reaching the network.
@@ -45,12 +41,12 @@ Options:
   --                    End option parsing; everything after is the specifier.
 
 Environment:
-  JSR_EXEC_CACHE   Cache directory (default: the OS cache dir + /jsr-exec).
-  JSR_URL          JSR registry base URL (default: https://jsr.io).
-  JSR_NPM_URL      JSR npm-compat registry (default: https://npm.jsr.io).
+  JSR_X_CACHE   Cache directory (default: the OS cache dir + /jsr-x).
+  JSR_URL       JSR registry base URL (default: https://jsr.io).
+  JSR_NPM_URL   JSR npm-compat registry (default: https://npm.jsr.io).
 
-Deno permission flags (-A, --allow-*, --unstable-*, ...) are accepted and
-ignored: Node has no permission system, and Deno-only APIs are not available.
+Deno-only flags such as -A and --allow-net are rejected: this runs on Node,
+which has neither a permission system nor Deno's APIs.
 `;
 
 /**
@@ -115,7 +111,6 @@ export function parseArgs(argv) {
         parsed.printEntry = true;
         break;
       default:
-        if (IGNORED_DENO_FLAGS.test(arg)) break;
         throw new Error(
           `unknown option: ${arg}\npass it to the program by putting it after the package specifier`,
         );
@@ -140,7 +135,7 @@ function ownVersion() {
 
 /**
  * Run the resolved entry file in a child Node process and settle with its exit
- * status, so `jsr-exec` is transparent to shells and CI.
+ * status, so `jsr-x` is transparent to shells and CI.
  *
  * @param {string} entry
  * @param {string[]} args
@@ -150,7 +145,7 @@ function runEntry(entry, args) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [entry, ...args], {
       stdio: "inherit",
-      env: { ...process.env, JSR_EXEC: "1" },
+      env: { ...process.env, JSR_X: "1" },
     });
 
     // Hold signals so the program gets a chance to shut down cleanly; without
@@ -244,7 +239,7 @@ async function prepare(spec, options) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
   if (!options.quiet && !isInstalled(dir, spec)) {
-    process.stderr.write(`jsr-exec: installing ${spec.pkg}@${version}\n`);
+    process.stderr.write(`jsr-x: installing ${spec.pkg}@${version}\n`);
   }
   return install(spec, version, { quiet: options.quiet, offline: options.offline });
 }

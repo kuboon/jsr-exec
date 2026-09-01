@@ -6,7 +6,7 @@ import { after, test } from "node:test";
 
 import { resolveEntrypoint } from "../src/entrypoint.js";
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "jsr-exec-entry-"));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "jsr-x-entry-"));
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
 let counter = 0;
