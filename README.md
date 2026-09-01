@@ -124,10 +124,10 @@ no network access.
 Releases go out through [staged publishing](https://docs.npmjs.com/staged-publishing/),
 so a green workflow is not enough to put a version on the registry.
 
-Publishing a GitHub release (or dispatching the `Publish` workflow) runs the
-tests and then `npm stage publish --provenance`. That uploads the tarball and
-parks it in the stage queue, where it is **not installable**. A maintainer then
-promotes it by hand:
+Publishing a GitHub release runs the tests and then
+`npm stage publish --provenance`. That uploads the tarball and parks it in the
+stage queue, where it is **not installable**. A maintainer then promotes it by
+hand:
 
 ```sh
 npm stage list jsr-x          # find the stage id
@@ -142,6 +142,18 @@ The approval is the point: a token or workflow that has been tampered with can
 stage a version, but it cannot make anyone install it — that still takes a
 maintainer and a second factor. Approving needs npm 11.15.0 or newer and 2FA on
 the account, and provenance is attested exactly as it is for a direct publish.
+
+### The first release is different
+
+npm has no stage queue for a package that does not exist yet: a brand-new name
+cannot be staged, because staging is a check on an existing package's
+maintainers, not a way to claim a name. So the very first version has to be
+published directly.
+
+Run the `Publish` workflow from the Actions tab with **first publish** ticked.
+That takes the `npm publish --provenance` path instead, which still attests
+provenance from CI. Every release after that — and every run triggered by a
+GitHub release, ticked or not — goes through the stage queue.
 
 ## License
 
