@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const BIN = fileURLToPath(new URL("../bin/jsr-x.js", import.meta.url));
+const BIN = fileURLToPath(new URL("../bin/jsrex.js", import.meta.url));
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
 const hasNpm = spawnSync(npmCommand, ["--version"], {
@@ -26,7 +26,7 @@ const hasNpm = spawnSync(npmCommand, ["--version"], {
   shell: process.platform === "win32",
 }).status === 0;
 
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "jsr-x-install-"));
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "jsrex-install-"));
 after(() => fs.rmSync(root, { recursive: true, force: true }));
 
 /**

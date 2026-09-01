@@ -9,7 +9,7 @@ on:
         description: >-
           Publish directly instead of staging. npm has no stage queue for a
           package that does not exist yet, so this is needed for the very
-          first release of jsr-x — and never again.
+          first release of jsrex — and never again.
         type: boolean
         default: false
 

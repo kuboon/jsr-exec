@@ -1,5 +1,5 @@
 /**
- * End-to-end tests for the `jsr-x` binary.
+ * End-to-end tests for the `jsrex` binary.
  *
  * The cache is seeded by hand with an exact version, which is the one path
  * that needs neither the network nor npm, so these run anywhere.
@@ -16,9 +16,9 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const BIN = fileURLToPath(new URL("../bin/jsr-x.js", import.meta.url));
+const BIN = fileURLToPath(new URL("../bin/jsrex.js", import.meta.url));
 
-const cache = fs.mkdtempSync(path.join(os.tmpdir(), "jsr-x-run-"));
+const cache = fs.mkdtempSync(path.join(os.tmpdir(), "jsrex-run-"));
 after(() => fs.rmSync(cache, { recursive: true, force: true }));
 
 /**
@@ -42,7 +42,7 @@ function seed(scope, name, version, files, manifest) {
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, contents);
   }
-  fs.writeFileSync(path.join(dir, ".jsr-x-complete"), "seeded\n");
+  fs.writeFileSync(path.join(dir, ".jsrex-complete"), "seeded\n");
   return dir;
 }
 
@@ -109,7 +109,7 @@ test("--offline fails on an uncached version instead of installing", async () =>
 
 test("--help and --version print without touching the network", async () => {
   const help = await run(["--help"]);
-  assert.match(help.stdout, /Usage:\s+jsr-x/);
+  assert.match(help.stdout, /Usage:\s+jsrex/);
 
   const version = await run(["--version"]);
   assert.match(version.stdout.trim(), /^\d+\.\d+\.\d+/);

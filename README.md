@@ -1,10 +1,10 @@
-# jsr-x
+# jsrex
 
 Run a [JSR](https://jsr.io) package with Node.js, the way `deno run jsr:@scope/name`
 runs one with Deno.
 
 ```sh
-npx jsr-x @kuboon/package
+npx jsrex @kuboon/package
 ```
 
 is the Node equivalent of
@@ -19,29 +19,29 @@ is fetched into a shared cache and executed.
 ## Usage
 
 ```sh
-npx jsr-x [options] <@scope/name[@version][/entrypoint]> [args...]
+npx jsrex [options] <@scope/name[@version][/entrypoint]> [args...]
 ```
 
 ```sh
 # Latest version, default export
-npx jsr-x @kuboon/package
+npx jsrex @kuboon/package
 
 # A pinned version, with arguments for the program
-npx jsr-x @kuboon/package@1.2.3 --flag value
+npx jsrex @kuboon/package@1.2.3 --flag value
 
 # A range and a named export, with the jsr: scheme spelled out
-npx jsr-x jsr:@std/http@^1/file-server ./public
+npx jsrex jsr:@std/http@^1/file-server ./public
 ```
 
 Arguments after the specifier belong to the program and are passed through
-untouched, so `--help` after the specifier is the program's help, not `jsr-x`'s.
-The program's exit code becomes `jsr-x`'s exit code.
+untouched, so `--help` after the specifier is the program's help, not `jsrex`'s.
+The program's exit code becomes `jsrex`'s exit code.
 
 Installing it globally drops the `npx`:
 
 ```sh
-npm install -g jsr-x
-jsr-x @kuboon/package
+npm install -g jsrex
+jsrex @kuboon/package
 ```
 
 ### Options
@@ -52,7 +52,7 @@ error — use `--` if the program's own first argument looks like one.
 | Option | Effect |
 | --- | --- |
 | `-h`, `--help` | Show usage. |
-| `-V`, `--version` | Show the `jsr-x` version. |
+| `-V`, `--version` | Show the `jsrex` version. |
 | `-q`, `--quiet` | Silence installation output. |
 | `--refresh` | Re-install even when the version is already cached. |
 | `--offline` | Never reach the network; resolve against the cache only. |
@@ -64,11 +64,11 @@ error — use `--` if the program's own first argument looks like one.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `JSR_X_CACHE` | OS cache dir + `/jsr-x` | Where packages are cached. |
+| `JSR_X_CACHE` | OS cache dir + `/jsrex` | Where packages are cached. |
 | `JSR_URL` | `https://jsr.io` | JSR registry used for version resolution. |
 | `JSR_NPM_URL` | `https://npm.jsr.io` | JSR npm-compatibility registry used for downloads. |
 
-`jsr-x` sets `JSR_X=1` in the child process, so a program can tell it was
+`jsrex` sets `JSR_X=1` in the child process, so a program can tell it was
 launched this way.
 
 ## How it works
@@ -102,7 +102,7 @@ under Deno.
 Two more consequences of running on Node:
 
 - There is no permission sandbox. Deno's permission flags are not accepted —
-  `jsr-x -A @scope/name` is an error rather than a lie — and the program has
+  `jsrex -A @scope/name` is an error rather than a lie — and the program has
   whatever access your Node process has.
 - `npm` must be on `PATH`; it does the downloading and dependency resolution.
 
@@ -130,7 +130,7 @@ stage queue, where it is **not installable**. A maintainer then promotes it by
 hand:
 
 ```sh
-npm stage list jsr-x          # find the stage id
+npm stage list jsrex          # find the stage id
 npm stage view <stage-id>     # inspect what CI actually built
 npm stage approve <stage-id>  # answer the 2FA challenge; the version goes live
 ```

@@ -16,13 +16,13 @@ export function cacheRoot() {
   const home = os.homedir();
   if (process.platform === "win32") {
     const base = process.env.LOCALAPPDATA || path.join(home, "AppData", "Local");
-    return path.join(base, "jsr-x", "Cache");
+    return path.join(base, "jsrex", "Cache");
   }
   if (process.platform === "darwin") {
-    return path.join(home, "Library", "Caches", "jsr-x");
+    return path.join(home, "Library", "Caches", "jsrex");
   }
   const xdg = process.env.XDG_CACHE_HOME;
-  return path.join(xdg && path.isAbsolute(xdg) ? xdg : path.join(home, ".cache"), "jsr-x");
+  return path.join(xdg && path.isAbsolute(xdg) ? xdg : path.join(home, ".cache"), "jsrex");
 }
 
 /**
@@ -44,7 +44,7 @@ export function installedPackagePath(dir, spec) {
 }
 
 /** Marker written last, so a half-finished install is never treated as usable. */
-const STAMP = ".jsr-x-complete";
+const STAMP = ".jsrex-complete";
 
 /**
  * @param {string} dir
@@ -62,7 +62,7 @@ export function isInstalled(dir, spec) {
  * into a fresh directory, then move it into the cache.
  *
  * The install happens in a sibling temp directory and is renamed into place so
- * concurrent `jsr-x` runs never observe a partial tree.
+ * concurrent `jsrex` runs never observe a partial tree.
  *
  * @param {import("./spec.js").Spec} spec
  * @param {string} version
@@ -87,7 +87,7 @@ export function install(spec, version, options = {}) {
       path.join(staging, "package.json"),
       `${JSON.stringify(
         {
-          name: `jsr-x-${spec.scope}-${spec.name}`,
+          name: `jsrex-${spec.scope}-${spec.name}`,
           version: "0.0.0",
           private: true,
           dependencies: { [spec.npmName]: version },
@@ -130,7 +130,7 @@ export function install(spec, version, options = {}) {
     if (result.error) {
       const cause = /** @type {NodeJS.ErrnoException} */ (result.error);
       if (cause.code === "ENOENT") {
-        throw new Error("npm was not found on PATH; jsr-x needs npm to install packages");
+        throw new Error("npm was not found on PATH; jsrex needs npm to install packages");
       }
       throw cause;
     }

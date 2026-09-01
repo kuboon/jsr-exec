@@ -62,7 +62,7 @@ function resolveFromExportsMap(exports, subpath) {
 }
 
 /**
- * Resolve the file `jsr-x` should hand to Node.
+ * Resolve the file `jsrex` should hand to Node.
  *
  * Mirrors what `deno run jsr:@scope/name[/sub]` does: the specifier's export
  * subpath is looked up in the package's own export map, falling back to the

@@ -1,4 +1,4 @@
-/** Argument parsing and the top-level `jsr-x` command. */
+/** Argument parsing and the top-level `jsrex` command. */
 
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -20,19 +20,19 @@ import { resolveVersion } from "./registry.js";
 import { isVersion, maxSatisfying } from "./semver.js";
 import { looksLikeSpec, parseSpec } from "./spec.js";
 
-export const USAGE = `jsr-x — run a JSR package with Node.js
+export const USAGE = `jsrex — run a JSR package with Node.js
 
 Usage:
-  jsr-x [options] <@scope/name[@version][/entrypoint]> [args...]
+  jsrex [options] <@scope/name[@version][/entrypoint]> [args...]
 
 Examples:
-  npx jsr-x @kuboon/package
-  npx jsr-x @kuboon/package@1.2.3 --flag value
-  npx jsr-x jsr:@std/http@^1/file-server ./public
+  npx jsrex @kuboon/package
+  npx jsrex @kuboon/package@1.2.3 --flag value
+  npx jsrex jsr:@std/http@^1/file-server ./public
 
 Options:
   -h, --help            Show this help.
-  -V, --version         Show the jsr-x version.
+  -V, --version         Show the jsrex version.
   -q, --quiet           Silence installation output.
       --refresh         Re-install even if the version is already cached.
       --offline         Fail instead of reaching the network.
@@ -41,7 +41,7 @@ Options:
   --                    End option parsing; everything after is the specifier.
 
 Environment:
-  JSR_X_CACHE   Cache directory (default: the OS cache dir + /jsr-x).
+  JSR_X_CACHE   Cache directory (default: the OS cache dir + /jsrex).
   JSR_URL       JSR registry base URL (default: https://jsr.io).
   JSR_NPM_URL   JSR npm-compat registry (default: https://npm.jsr.io).
 
@@ -135,7 +135,7 @@ function ownVersion() {
 
 /**
  * Run the resolved entry file in a child Node process and settle with its exit
- * status, so `jsr-x` is transparent to shells and CI.
+ * status, so `jsrex` is transparent to shells and CI.
  *
  * @param {string} entry
  * @param {string[]} args
@@ -239,7 +239,7 @@ async function prepare(spec, options) {
     fs.rmSync(dir, { recursive: true, force: true });
   }
   if (!options.quiet && !isInstalled(dir, spec)) {
-    process.stderr.write(`jsr-x: installing ${spec.pkg}@${version}\n`);
+    process.stderr.write(`jsrex: installing ${spec.pkg}@${version}\n`);
   }
   return install(spec, version, { quiet: options.quiet, offline: options.offline });
 }

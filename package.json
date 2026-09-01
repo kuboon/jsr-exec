@@ -1,10 +1,10 @@
 {
-  "name": "jsr-x",
+  "name": "jsrex",
   "version": "0.1.0",
-  "description": "Run a JSR package with Node.js: npx jsr-x @scope/name — the Node equivalent of deno run jsr:@scope/name",
+  "description": "Run a JSR package with Node.js: npx jsrex @scope/name — the Node equivalent of deno run jsr:@scope/name",
   "type": "module",
   "bin": {
-    "jsr-x": "bin/jsr-x.js"
+    "jsrex": "bin/jsrex.js"
   },
   "exports": {
     ".": "./src/cli.js",

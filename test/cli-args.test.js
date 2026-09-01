@@ -3,7 +3,7 @@ import { test } from "node:test";
 
 import { parseArgs } from "../src/cli.js";
 
-test("splits jsr-x options from program arguments", () => {
+test("splits jsrex options from program arguments", () => {
   const parsed = parseArgs(["--quiet", "@kuboon/package", "--flag", "-q", "value"]);
   assert.equal(parsed.action, "run");
   assert.equal(parsed.quiet, true);
