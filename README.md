@@ -151,9 +151,14 @@ maintainers, not a way to claim a name. So the very first version has to be
 published directly.
 
 Run the `Publish` workflow from the Actions tab with **first publish** ticked.
-That takes the `npm publish --provenance` path instead, which still attests
-provenance from CI. Every release after that — and every run triggered by a
-GitHub release, ticked or not — goes through the stage queue.
+That takes the `npm publish --provenance --access public` path instead, which
+still attests provenance from CI. `--access public` is required there rather
+than decorative: npm will not attest provenance for a package it has not seen
+before unless access is stated outright, even for an unscoped name that is
+public anyway.
+
+Every release after that — and every run triggered by a GitHub release, ticked
+or not — goes through the stage queue.
 
 ## License
 
