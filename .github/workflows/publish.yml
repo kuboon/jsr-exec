@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
+  stage:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,7 +17,12 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+      # `npm stage` needs npm 11.15.0 or newer; the bundled npm may be older.
+      - run: npm install -g npm@latest
       - run: npm test
-      - run: npm publish --provenance --access public
+      # Stages the version rather than releasing it. It becomes installable
+      # only once a maintainer runs `npm stage approve <id>` and answers the
+      # 2FA challenge, so a compromised workflow cannot ship on its own.
+      - run: npm stage publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
