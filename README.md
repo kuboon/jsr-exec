@@ -108,6 +108,18 @@ Two more consequences of running on Node:
 
 Requires Node.js 20.11 or newer.
 
+## This belongs upstream
+
+`jsr`, the official CLI, has no equivalent of `deno run jsr:…`. Its `run` command
+runs a script from your `package.json`, not a JSR package, and nothing there
+fetches and executes a package that is not already a dependency. Asking for one is
+[jsr-io/jsr-npm#122](https://github.com/jsr-io/jsr-npm/issues/122), open since
+February 2025.
+
+That is where this should end up. One tool beats two, and `jsr` is where people
+will look for it. If the command lands upstream, this README will point at it and
+`jsrex` will wind down.
+
 ## Development
 
 ```sh

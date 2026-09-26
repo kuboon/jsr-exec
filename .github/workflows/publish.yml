@@ -8,6 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Guards against a hung publish holding a runner for the Actions default of
+    # 360 minutes. Higher than CI's: this one also talks to the registry.
+    timeout-minutes: 15
     permissions:
       contents: read
       id-token: write # the OIDC token npm exchanges for publish rights

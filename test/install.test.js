@@ -101,7 +101,11 @@ async function startRegistry() {
   };
 }
 
-test("installs from the npm-compat registry and runs the package", { skip: !hasNpm }, async () => {
+// Longer than the rest: this one really installs from a registry.
+test("installs from the npm-compat registry and runs the package", {
+  skip: !hasNpm,
+  timeout: 120_000,
+}, async () => {
   const registry = await startRegistry();
   const cache = path.join(root, "cache");
   const env = {

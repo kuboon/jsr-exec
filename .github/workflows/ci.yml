@@ -8,6 +8,9 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    # The suite finishes in seconds. Without this the job inherits the Actions
+    # default of 360 minutes, so one hung test burns six hours of runner time.
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
