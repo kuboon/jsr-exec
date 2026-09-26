@@ -18,6 +18,13 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const BIN = fileURLToPath(new URL("../bin/jsrex.js", import.meta.url));
 
+/**
+ * Every test here spawns a child process, so every one of them can hang
+ * forever if that child never exits. node:test has no timeout by default, so
+ * without this a hang would sit until the CI job's own limit killed it.
+ */
+const TIMEOUT = 30_000;
+
 const cache = fs.mkdtempSync(path.join(os.tmpdir(), "jsrex-run-"));
 after(() => fs.rmSync(cache, { recursive: true, force: true }));
 
@@ -69,22 +76,22 @@ function run(args, env = {}) {
   });
 }
 
-test("runs a cached package and forwards arguments", async () => {
+test("runs a cached package and forwards arguments", { timeout: TIMEOUT }, async () => {
   const { stdout } = await run(["@kuboon/demo@1.0.0", "a", "--b", "c"]);
   assert.equal(stdout.trim(), 'hello from ["a","--b","c"]');
 });
 
-test("runs a subpath entrypoint", async () => {
+test("runs a subpath entrypoint", { timeout: TIMEOUT }, async () => {
   const { stdout } = await run(["@kuboon/demo@1.0.0/cli"]);
   assert.equal(stdout.trim(), "cli entrypoint");
 });
 
-test("accepts the jsr: scheme", async () => {
+test("accepts the jsr: scheme", { timeout: TIMEOUT }, async () => {
   const { stdout } = await run(["jsr:@kuboon/demo@1.0.0", "x"]);
   assert.equal(stdout.trim(), 'hello from ["x"]');
 });
 
-test("propagates the program's exit code", async () => {
+test("propagates the program's exit code", { timeout: TIMEOUT }, async () => {
   const error = await run(["@kuboon/demo@1.0.0", "--fail"]).then(
     () => null,
     (err) => err,
@@ -93,12 +100,12 @@ test("propagates the program's exit code", async () => {
   assert.equal(error.code, 3);
 });
 
-test("--print-entry reports the resolved file without running it", async () => {
+test("--print-entry reports the resolved file without running it", { timeout: TIMEOUT }, async () => {
   const { stdout } = await run(["--print-entry", "@kuboon/demo@1.0.0"]);
   assert.equal(stdout.trim(), path.join(cache, "pkgs/kuboon__demo/1.0.0/node_modules/@jsr/kuboon__demo/_dist/mod.js"));
 });
 
-test("--offline fails on an uncached version instead of installing", async () => {
+test("--offline fails on an uncached version instead of installing", { timeout: TIMEOUT }, async () => {
   const error = await run(["--offline", "@kuboon/demo@9.9.9"]).then(
     () => null,
     (err) => err,
@@ -107,7 +114,7 @@ test("--offline fails on an uncached version instead of installing", async () =>
   assert.match(error.stderr, /not in the cache and --offline was given/);
 });
 
-test("--help and --version print without touching the network", async () => {
+test("--help and --version print without touching the network", { timeout: TIMEOUT }, async () => {
   const help = await run(["--help"]);
   assert.match(help.stdout, /Usage:\s+jsrex/);
 
@@ -118,13 +125,13 @@ test("--help and --version print without touching the network", async () => {
   assert.equal(cacheDir.stdout.trim(), cache);
 });
 
-test("an invalid specifier fails with a usable message", async () => {
+test("an invalid specifier fails with a usable message", { timeout: TIMEOUT }, async () => {
   const error = await run(["chalk"]).then(() => null, (err) => err);
   assert.ok(error, "expected a failure");
   assert.match(error.stderr, /invalid JSR specifier/);
 });
 
-test("--offline resolves a range against the cache", async () => {
+test("--offline resolves a range against the cache", { timeout: TIMEOUT }, async () => {
   const { stdout } = await run(["--offline", "@kuboon/demo@^1", "z"]);
   assert.equal(stdout.trim(), 'hello from ["z"]');
 
@@ -134,7 +141,7 @@ test("--offline resolves a range against the cache", async () => {
   assert.match(error.stderr, /cached: 1\.0\.0/);
 });
 
-test("forwards SIGTERM to the program and reports 143", async (t) => {
+test("forwards SIGTERM to the program and reports 143", { timeout: TIMEOUT }, async (t) => {
   if (process.platform === "win32") return t.skip("POSIX signals only");
 
   seed(
@@ -153,6 +160,11 @@ test("forwards SIGTERM to the program and reports 143", async (t) => {
     env: { ...process.env, JSREX_CACHE: cache },
     stdio: ["ignore", "pipe", "inherit"],
   });
+
+  // The program runs an interval and never exits by itself, so if this test
+  // times out waiting for it the child has to be killed here — otherwise it
+  // outlives the runner and holds the job open to its own limit.
+  t.after(() => child.kill("SIGKILL"));
 
   let out = "";
   child.stdout.setEncoding("utf8");
